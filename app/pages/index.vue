@@ -1,52 +1,43 @@
 <script setup lang="ts">
-// Konsta UI components
-import {
-  kPage,
-  kNavbar,
-  kBlock,
-  kButton,
-  kList,
-  kListItem,
-  kBlockTitle,
-} from 'konsta/vue'
+import { kBlock, kBlockTitle } from 'konsta/vue'
 
-const onButtonClick = (button: string) => () => {
-  window.alert(`Button ${button} clicked!`)
-}
+definePageMeta({
+  layout: 'home',
+})
+
+const { results } = useBarcodeScanner()
+
+const { rightActions } = useMainNavbar()
+
+onMounted(() => {
+  rightActions.value = [
+    { icon: 'i-lucide-cog', onClick() { navigateTo('/settings') } },
+  ]
+})
 </script>
 
 <template>
-  <k-page>
-    <k-navbar title="My App" />
-
-    <k-block strong>
-      <p>Here is your Nuxt & Konsta UI app. Let's see what we have here.</p>
-    </k-block>
-    <k-block-title>Navigation</k-block-title>
-    <k-list
-      strong
-      inset
-    >
-      <k-list-item
-        href="/about/"
-        title="About"
-      />
-      <k-list-item
-        href="/form/"
-        title="Form"
-      />
-    </k-list>
-
+  <div>
     <k-block
       strong
-      class="flex space-x-4"
+      inset-ios
     >
-      <k-button @click="onButtonClick('button-1')">
-        Button 1
-      </k-button>
-      <k-button @click="onButtonClick('button-2')">
-        Button 2
-      </k-button>
+      <p>Start scanning, this app should work on iOS, Android and Electron (Mac, Windows, Linux).</p>
+      <p class="underline text-error">
+        Results will appear below as you scan.
+      </p>
     </k-block>
-  </k-page>
+    <k-block-title v-if="results.length">
+      Scan results
+    </k-block-title>
+    <k-block v-if="results.length">
+      <UPageGrid>
+        <ScanResultCard
+          v-for="result in results"
+          :key="result.scannedAt"
+          :result="result"
+        />
+      </UPageGrid>
+    </k-block>
+  </div>
 </template>

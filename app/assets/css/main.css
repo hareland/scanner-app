@@ -1,14 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
+@import "tailwindcss";
+@import "konsta/vue/theme.css";
+@import "@nuxt/ui";
 
-@import 'tailwindcss';
-/* import Konsta UI v5 theme */
-@import 'konsta/vue/theme.css';
-
-@theme {
-    --color-brand-primary: #007aff;
-    --color-brand-red: #ff3b30;
-    --color-brand-green: #4cd964;
-    --color-brand-yellow: #ffcc00;
-    --color-brand-purple: #9c27b0;
-    --color-brand-blue: #2196f3;
+/* Static fallbacks in @theme for Tailwind to generate utilities */
+/* Runtime mappings via CSS custom properties */
+html {
+    --k-color-primary: var(--ui-primary, #22c55e);
+    --k-color-secondary: var(--ui-secondary);
+    --k-color-neutral: var(--ui-neutral, #374151);
+    --color-brand-red: var(--ui-error, #ef4444);
+    --color-brand-blue: var(--ui-info, #3b82f6);
+    --color-brand-yellow: var(--ui-warning, #eab308);
 }
+@theme {
+    --k-color-primary: #22c55e;
+    --k-color-neutral: #374151;
+    --color-brand-red:  #ef4444;
+    --color-brand-blue: #3b82f6;
+    --color-brand-yellow: #eab308;
+    --color-brand-green: #22c55e;
+    --color-brand-purple: #a855f7;
+}
+
+
+@custom-variant electron (&:where([data-platform="electron"] *));
+@custom-variant web (&:where([data-platform="web"] *));

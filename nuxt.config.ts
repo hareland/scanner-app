@@ -1,7 +1,13 @@
-import tailwindcss from '@tailwindcss/vite'
-
 export default defineNuxtConfig({
-  modules: ['nuxt-capacitor', '@nuxtjs/color-mode'],
+  modules: [
+    'nuxt-qrcode',
+    '@nuxt/ui',
+    '@nuxtjs/color-mode',
+    'nuxt-capacitor',
+    '@nuxt/eslint',
+    ...import.meta.dev ? ['./modules/developer'] : [],
+  ],
+  ssr: false,
   devtools: { enabled: false },
   app: {
     head: {
@@ -17,17 +23,55 @@ export default defineNuxtConfig({
     fallback: 'light',
     storage: 'localStorage',
   },
-  compatibilityDate: '2025-07-15',
-  vite: {
-    plugins: [
-      // @ts-expect-error This is an upstream issue
-      tailwindcss(),
-    ],
+  spaLoadingTemplate: false,
+  build: {
+    transpile: ['konsta'],
   },
+  compatibilityDate: '2025-07-15',
   capacitor: {
     config: {
-      appId: process.env.CAPACITOR_APP_ID || 'com.example.nuxtcapacitorkonstaui',
-      appName: process.env.CAPACITOR_APP_NAME || 'Nuxt Capacitor',
+      appId: process.env.CAPACITOR_APP_ID || 'eu.hareland.app.scanner',
+      appName: process.env.CAPACITOR_APP_NAME || 'Scanner',
+      plugins: {
+        StatusBar: {
+          style: 'DARK',
+        },
+        CapacitorHttp: {
+          enabled: true,
+        },
+      },
+      ios: {
+        contentInset: 'never',
+      },
+      electron: {
+        safeDomains: ['fonts.googleapis.com', 'api.iconify.design'],
+      },
+    },
+  },
+  developer: {
+    enabled: true,
+  },
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: 'always-multiline',
+        braceStyle: '1tbs',
+        blockSpacing: true,
+      },
+    },
+  },
+  qrcode: {
+    options: {
+      variant: 'pixelated',
+      // OR
+      // variant: {
+      //   inner: 'circle',
+      //   marker: 'rounded',
+      //   pixel: 'rounded',
+      // },
+      radius: 1,
+      blackColor: 'currentColor', // 'var(--ui-text-highlighted)' if you are using `@nuxt/ui` v3
+      whiteColor: 'transparent', // 'var(--ui-bg)'
     },
   },
 })
