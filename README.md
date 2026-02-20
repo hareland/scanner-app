@@ -4,6 +4,12 @@
 # Running locally
 
 ## 1. Install dependencies
+
+```bash
+npx giget@latest gh:hareland/scanner-app
+```
+
+
 ```bash
 pnpm i && cd electron && npm i && cd ..
 ```
