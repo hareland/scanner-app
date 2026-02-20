@@ -48,8 +48,8 @@ importers:
         specifier: ^4.3.1
         version: 4.3.1(@capacitor/preferences@8.0.1(@capacitor/core@8.1.0))(@parcel/watcher@2.5.6)(@types/node@24.10.13)(@vue/compiler-sfc@3.5.28)(better-sqlite3@12.6.2)(cac@6.7.14)(db0@0.3.4(better-sqlite3@12.6.2))(eslint@9.39.2(jiti@2.6.1))(ioredis@5.9.3)(lightningcss@1.31.1)(magicast@0.5.2)(optionator@0.9.4)(rollup@4.57.1)(terser@5.46.0)(typescript@5.9.3)(vite@7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.46.0)(yaml@2.8.2))(xml2js@0.6.2)(yaml@2.8.2)
       nuxt-capacitor:
-        specifier: 0.1.6
-        version: 0.1.6(3cd994f8e86f555de8ae1a6888212931)
+        specifier: 0.2.0
+        version: 0.2.0(3cd994f8e86f555de8ae1a6888212931)
       scule:
         specifier: ^1.3.0
         version: 1.3.0
@@ -4531,8 +4531,8 @@ packages:
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
 
-  nuxt-capacitor@0.1.6:
-    resolution: {integrity: sha512-58MN9oUv3I4g1P1JM3eFhNqL/9lk3F6Nv6RtYsndN5dhWvIFHfyKeuX4wRXwPKACOdMo4jDnWZtbtZA2LOhJ5Q==}
+  nuxt-capacitor@0.2.0:
+    resolution: {integrity: sha512-h2K0dysQ2IXELvv34rfYJXWW9vpA639XU5Zhbm4NV57YEJCe5IK0iOsFp2QfwEtl1r2g5p2aNXPX+QBJRdQwlw==}
     peerDependencies:
       '@capacitor/cli': ^8.1.x
       better-sqlite3: 12.x
@@ -10691,7 +10691,7 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
-  nuxt-capacitor@0.1.6(3cd994f8e86f555de8ae1a6888212931):
+  nuxt-capacitor@0.2.0(3cd994f8e86f555de8ae1a6888212931):
     dependencies:
       '@capacitor/cli': 8.1.0
       '@capacitor/core': 8.1.0
