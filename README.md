@@ -9,7 +9,7 @@
 npx giget@latest gh:hareland/scanner-app
 ```
 
-
+> Then from the root of the project:
 ```bash
 pnpm i && cd electron && npm i && cd ..
 ```
