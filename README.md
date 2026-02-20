@@ -20,7 +20,7 @@ pnpm dev --host=0.0.0.0
 > Ensure that you have set a Team ID in Xcode -> if you are not on mine.
 
 ```bash
-npx cap run ios [--target=<deviceUUID>]
+npx cap run ios [--live-reload] [--target=<deviceUUID>]
 ```
 
 ### Electron
