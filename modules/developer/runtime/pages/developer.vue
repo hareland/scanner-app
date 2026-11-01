@@ -1,94 +1,83 @@
 <script setup lang="ts">
-import { kNavbar, kNavbarBackLink, kBlockTitle, kBlock, kButton } from 'konsta/vue'
-import { useSavedScanResults, useDeveloper } from '#imports'
-import { useClipboard } from '@vueuse/core'
+import { kBlock, kBlockTitle, kList, kListItem } from 'konsta/vue'
+import { definePageMeta, useNativeActions, useSavedScanResults, useScannerSettings, useToast, ref } from '#imports'
+import type { ScanResult } from '~/types/scanner'
+
+definePageMeta({ title: 'Developer' })
 
 const toast = useToast()
-const { copy, copied } = useClipboard()
-const { results, importItems } = useSavedScanResults()
+const actions = useNativeActions()
+const { list, importItems } = useSavedScanResults()
+const { settings, reset } = useScannerSettings()
 
-watch(copied, (b) => {
-  if (!b) return
-  toast.add({
-    title: 'Copied to clipboard',
-    icon: 'i-lucide-check',
-    color: 'success',
-  })
-})
+const importInput = ref('')
 
-const copyAllAsJson = async () => {
-  const jsonString = JSON.stringify({
-    results: toRaw(Array.from(results.value.values())),
-  }, null, 2)
-  await copy(jsonString)
-}
+const exportJson = () => JSON.stringify({ results: list.value.map(({ id: _id, ...result }) => result) }, null, 2)
 
-const importInput = ref<string | undefined>()
-
-const parseImportInput = () => {
+async function onImport() {
+  let parsed: { results?: ScanResult[] }
   try {
-    return JSON.parse(importInput.value ?? '{}')
-  } catch (_) {
-    return null
+    parsed = JSON.parse(importInput.value || '{}')
+  } catch {
+    toast.add({ title: 'Invalid JSON', icon: 'i-lucide-circle-alert', color: 'error' })
+    return
   }
-}
-
-const onImportJson = async () => {
-  const parsedJson = parseImportInput()
-
-  if (!parsedJson) return toast.add({
-    title: 'Invalid JSON',
-    icon: 'i-lucide-alert-circle',
-    color: 'error',
-  })
-
-  const { results } = parsedJson
-
-  const importedKeys = []
-  if (results && Array.isArray(results)) {
-    // idk, maybe append?
-    await importItems(results)
-    importedKeys.push('results')
-  }
-
-  toast.add({
-    title: `Imported ${importedKeys.join(', ')}`,
-    icon: 'i-lucide-check',
-    color: 'success',
-  })
+  const results = Array.isArray(parsed.results) ? parsed.results.filter(r => r?.text && r?.format) : []
+  await importItems(results.map(r => ({ text: r.text, format: r.format, scannedAt: r.scannedAt ?? Date.now(), description: r.description })))
+  importInput.value = ''
+  toast.add({ title: `Imported ${results.length} codes`, icon: 'i-lucide-check', color: 'success' })
 }
 </script>
 
 <template>
   <div>
-    <k-navbar title="Developer">
-      <template #left>
-        <k-navbar-back-link
-          icon-only
-          @click="$router.back()"
-        />
-      </template>
-    </k-navbar>
-    <k-block-title>
-      Export Saved Results
-    </k-block-title>
-    <k-block>
-      <k-button @click="copyAllAsJson">
-        Copy all as JSON
-      </k-button>
-    </k-block>
+    <k-block-title>Saved codes</k-block-title>
+    <k-list
+      strong-ios
+      inset-ios
+    >
+      <k-list-item
+        link
+        title="Copy all as JSON"
+        :after="String(list.length)"
+        @click="actions.copy(exportJson())"
+      />
+      <k-list-item
+        link
+        title="Share as JSON"
+        @click="actions.share(exportJson(), 'Saved codes')"
+      />
+    </k-list>
+
     <k-block-title>Import</k-block-title>
-    <k-block class="flex flex-col gap-4">
+    <k-block class="flex flex-col gap-3">
       <UTextarea
         v-model="importInput"
-        class="w-full"
-        placeholder="Paste JSON"
-        :rows="10"
+        class="w-full font-mono"
+        placeholder="{ &quot;results&quot;: [{ &quot;text&quot;: &quot;…&quot;, &quot;format&quot;: &quot;QR_CODE&quot; }] }"
+        :rows="6"
         autoresize
       />
-      <k-button @click="onImportJson">
-        Import
-      </k-button>
+      <UButton
+        label="Import"
+        icon="i-lucide-import"
+        size="lg"
+        block
+        :disabled="!importInput"
+        @click="onImport"
+      />
+    </k-block>
+
+    <k-block-title>Scanner settings</k-block-title>
+    <k-block>
+      <pre class="overflow-x-auto text-xs">{{ settings }}</pre>
+      <UButton
+        label="Reset scanner settings"
+        color="error"
+        variant="soft"
+        class="mt-3"
+        @click="reset"
+      />
     </k-block>
   </div>
 </template>

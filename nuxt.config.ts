@@ -1,41 +1,38 @@
+const appId = process.env.CAPACITOR_APP_ID || 'eu.hareland.app.scanner'
+
+// A static SPA: `nuxt generate` writes `.output/public`, which Capacitor serves from the device.
 export default defineNuxtConfig({
   modules: [
-    'nuxt-qrcode',
-    '@nuxt/ui',
-    '@nuxtjs/color-mode',
-    'nuxt-capacitor',
     '@nuxt/eslint',
-    ...import.meta.dev ? ['./modules/developer'] : [],
+    '@nuxt/ui',
+    '@frigear-nu/ui',
+    'nuxt-capacitor',
+    'nuxt-qrcode',
+    // Adds useDeveloper() always, and the /settings/developer page in dev builds.
+    './modules/developer',
   ],
   ssr: false,
   devtools: { enabled: false },
   app: {
     head: {
-      meta: [
-        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' },
-      ],
+      // maximum-scale=1 stops iOS zooming the page when a field with text under 16px gets focus.
+      viewport: 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover',
     },
   },
   css: ['~/assets/css/main.css'],
-  colorMode: {
-    classPrefix: '',
-    preference: 'system',
-    fallback: 'light',
-    storage: 'localStorage',
-  },
   spaLoadingTemplate: false,
   build: {
     transpile: ['konsta'],
   },
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: '2026-06-30',
+  // nuxt-capacitor writes capacitor.config.json from this (and points `webDir` at the generated output).
   capacitor: {
+    // Off: on dev start it would run `nuxt generate` and `cap sync`. Sync explicitly with `ios:sync`.
+    autoSync: false,
     config: {
-      appId: process.env.CAPACITOR_APP_ID || 'eu.hareland.app.scanner',
+      appId,
       appName: process.env.CAPACITOR_APP_NAME || 'Scanner',
       plugins: {
-        StatusBar: {
-          style: 'DARK',
-        },
         CapacitorHttp: {
           enabled: true,
         },
@@ -43,13 +40,7 @@ export default defineNuxtConfig({
       ios: {
         contentInset: 'never',
       },
-      electron: {
-        safeDomains: ['fonts.googleapis.com', 'api.iconify.design'],
-      },
     },
-  },
-  developer: {
-    enabled: true,
   },
   eslint: {
     config: {
@@ -63,15 +54,9 @@ export default defineNuxtConfig({
   qrcode: {
     options: {
       variant: 'pixelated',
-      // OR
-      // variant: {
-      //   inner: 'circle',
-      //   marker: 'rounded',
-      //   pixel: 'rounded',
-      // },
       radius: 1,
-      blackColor: 'currentColor', // 'var(--ui-text-highlighted)' if you are using `@nuxt/ui` v3
-      whiteColor: 'transparent', // 'var(--ui-bg)'
+      blackColor: 'currentColor',
+      whiteColor: 'transparent',
     },
   },
 })

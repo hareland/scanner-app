@@ -1,59 +1,26 @@
 <script setup lang="ts">
-import { StatusBar, Style } from '@capacitor/status-bar'
+import { App } from 'konsta/vue'
 
-import { App, useTheme } from 'konsta/vue'
-import { Capacitor } from '@capacitor/core'
-
-const theme = useTheme()
 const colorMode = useColorMode()
+// On a device the native bars own the safe areas (layouts/default.vue pads by their CSS variables).
+const nativeChrome = useState('native-chrome', () => false)
 
-const inIFrame = computed(() => {
-  if (import.meta.env.SSR) return false
-  return window.parent !== window
-})
-
-const enableSafeArea = computed(() => {
-  if (inIFrame.value) {
-    return false
-  }
-
-  switch (Capacitor.getPlatform()) {
-    case 'electron':
-      return false
-
-    default:
-      return true
-  }
-})
-
-const toasterPosition = computed(() => {
-  if (Capacitor.getPlatform() === 'electron') return 'bottom-right'
-
-  return 'top-right'
-})
-
-watch(colorMode, async (cm) => {
-  try {
-    await StatusBar.setStyle({ style: cm.value === 'dark' ? Style.Dark : Style.Light })
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_) { /* Empty... */ }
-})
-
-onMounted(() => {
-  document.documentElement.dataset.platform = Capacitor.getPlatform()
-})
+// Toasts drop in from the top, just below the native navbar, as iOS banners do; at the bottom the tab bar hides them.
+// In a browser the variable is unset and they sit 1rem from the top.
+const toaster = { position: 'top-center' as const, ui: { viewport: 'top-[calc(var(--cap-native-navigation-top,0px)+1rem)]' } }
 </script>
 
 <template>
   <App
-    :theme="theme"
-    :safe-areas="enableSafeArea"
+    theme="ios"
+    :safe-areas="!nativeChrome"
     :dark="colorMode.value === 'dark'"
   >
-    <UApp :toaster="{ position: toasterPosition }">
+    <UApp :toaster="toaster">
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
+      <ResultSheet />
     </UApp>
   </App>
 </template>

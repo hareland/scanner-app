@@ -2,11 +2,7 @@ export default defineAppConfig({
   ui: {
     colors: {
       primary: 'green',
-      secondary: 'zinc',
-      // secondary: 'orange',
+      neutral: 'zinc',
     },
-  },
-  bottomNavigation: {
-    hideOnUnknown: true,
   },
 })

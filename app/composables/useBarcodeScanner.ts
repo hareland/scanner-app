@@ -5,8 +5,9 @@ import {
   CapacitorBarcodeScannerScanOrientation,
   CapacitorBarcodeScannerTypeHint,
 } from '@capacitor/barcode-scanner'
-import type { ScanResult, BarcodeFormat } from '~/types/scanner'
 import { createSharedComposable } from '@vueuse/core'
+import type { ScanResult, BarcodeFormat } from '~/types/scanner'
+import { haptic } from '~/lib/native'
 
 const formatMap: Record<number, BarcodeFormat> = {
   [CapacitorBarcodeScannerTypeHint.QR_CODE]: 'QR_CODE',
@@ -24,40 +25,48 @@ const formatMap: Record<number, BarcodeFormat> = {
   [CapacitorBarcodeScannerTypeHint.PDF_417]: 'PDF_417',
 }
 
+/** Scans one code with the system scanner. `results` holds this session's scans, oldest first. */
 const _useBarcodeScanner = () => {
   const results = ref<ScanResult[]>([])
+  const { settings } = useScannerSettings()
 
   const scanBarcode = async () => {
     const result = await CapacitorBarcodeScanner.scanBarcode({
       hint: CapacitorBarcodeScannerTypeHint.ALL,
       android: { scanningLibrary: CapacitorBarcodeScannerAndroidScanningLibrary.MLKIT },
       scanText: 'Scan',
-      scanInstructions: 'Point to a code',
+      scanInstructions: 'Point the camera at a code',
       web: {
-        showCameraSelection: true,
+        showCameraSelection: settings.webCameraSelection,
         scannerFPS: 30,
       },
-      cameraDirection: CapacitorBarcodeScannerCameraDirection.BACK,
-      scanOrientation: CapacitorBarcodeScannerScanOrientation.PORTRAIT,
+      cameraDirection: settings.cameraFacing === 'front'
+        ? CapacitorBarcodeScannerCameraDirection.FRONT
+        : CapacitorBarcodeScannerCameraDirection.BACK,
+      scanOrientation: CapacitorBarcodeScannerScanOrientation.ADAPTIVE,
     })
 
-    if (result?.ScanResult) {
-      const item: ScanResult = {
-        text: result.ScanResult,
-        format: formatMap[result.format] ?? `UNKNOWN_${result.format}`,
-        scannedAt: Date.now(),
-      }
-      results.value.push(item)
+    if (!result?.ScanResult) return undefined
 
-      return item
+    const item: ScanResult = {
+      text: result.ScanResult,
+      format: formatMap[result.format] ?? `UNKNOWN_${result.format}`,
+      scannedAt: Date.now(),
     }
+    results.value.push(item)
+    if (settings.hapticFeedback) haptic('success').catch(() => {})
 
-    return undefined
+    return item
+  }
+
+  const clear = () => {
+    results.value = []
   }
 
   return {
     results,
     scanBarcode,
+    clear,
   }
 }
 
