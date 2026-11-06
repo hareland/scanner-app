@@ -13,7 +13,7 @@ function render() {
   const format = jsBarcodeFormat(props.format)
   if (!svg.value || !format || !props.value) return
   try {
-    JsBarcode(svg.value, props.value, {
+    JsBarcode(svg.value, barcodeValue(props.format, props.value), {
       format,
       background: 'transparent',
       lineColor: 'currentColor',

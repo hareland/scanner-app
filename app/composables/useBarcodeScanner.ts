@@ -50,7 +50,7 @@ const _useBarcodeScanner = () => {
 
     const item: ScanResult = {
       text: result.ScanResult,
-      format: formatMap[result.format] ?? `UNKNOWN_${result.format}`,
+      format: normalizeFormat(formatMap[result.format] ?? `UNKNOWN_${result.format}`, result.ScanResult),
       scannedAt: Date.now(),
     }
     results.value.push(item)
