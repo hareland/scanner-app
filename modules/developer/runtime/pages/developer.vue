@@ -3,7 +3,7 @@ import { kBlock, kBlockTitle, kList, kListItem } from 'konsta/vue'
 import { definePageMeta, useNativeActions, useSavedScanResults, useScannerSettings, useToast, ref } from '#imports'
 import type { ScanResult } from '~/types/scanner'
 
-definePageMeta({ title: 'Developer' })
+definePageMeta({ mobile: { title: 'Developer' } })
 
 const toast = useToast()
 const actions = useNativeActions()

@@ -2,8 +2,6 @@
 import { kBlock, kBlockTitle, kSegmented, kSegmentedButton } from 'konsta/vue'
 import type { BarcodeFormat } from '~/types/scanner'
 
-definePageMeta({ title: 'Create' })
-
 const { save } = useSavedScanResults()
 const native = useNativeActions()
 const toast = useToast()

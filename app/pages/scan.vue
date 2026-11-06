@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import { kBlock, kBlockTitle, kList } from 'konsta/vue'
 
-definePageMeta({ title: 'Scan' })
-
 const { results, clear } = useBarcodeScanner()
 const { present, scanAndPresent } = useScanFlow()
 
 const sorted = computed(() => [...results.value].reverse())
-
-useNavbarActions(() => results.value.length
-  ? [{ id: 'clear-session', label: 'Clear session', icon: 'i-lucide-list-x', sfSymbol: 'xmark.circle', onSelect: clear }]
-  : [])
 </script>
 
 <template>
@@ -43,6 +37,16 @@ useNavbarActions(() => results.value.length
           @select="present(result)"
         />
       </k-list>
+      <k-block>
+        <UButton
+          label="Clear session"
+          icon="i-lucide-list-x"
+          color="neutral"
+          variant="soft"
+          block
+          @click="clear"
+        />
+      </k-block>
     </template>
     <UEmpty
       v-else

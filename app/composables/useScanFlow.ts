@@ -1,6 +1,5 @@
 import { createSharedComposable } from '@vueuse/core'
 import type { ScanResult } from '~/types/scanner'
-import { haptic } from '~/lib/native'
 
 /**
  * Scanning from anywhere (the tab, the floating button) and the one result sheet that shows a scan or a saved code
@@ -11,6 +10,7 @@ const _useScanFlow = () => {
   const { save } = useSavedScanResults()
   const { settings } = useScannerSettings()
   const toast = useToast()
+  const { haptic } = useNative()
 
   const sheet = reactive<{ open: boolean, result?: ScanResult, savedId?: string }>({ open: false })
 
@@ -31,7 +31,7 @@ const _useScanFlow = () => {
       // Closing the scanner rejects too; only report real failures.
       const message = e instanceof Error ? e.message : String(e)
       if (!/cancel/i.test(message)) {
-        haptic('error').catch(() => {})
+        void haptic('error')
         toast.add({ title: 'Could not scan', description: message, color: 'error', icon: 'i-lucide-circle-alert' })
       }
       return undefined

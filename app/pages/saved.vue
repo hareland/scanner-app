@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { kBlock, kList } from 'konsta/vue'
 
-definePageMeta({ title: 'Saved' })
-
 const { list, loaded, clear } = useSavedScanResults()
 const { present, scanAndPresent } = useScanFlow()
 const actions = useNativeActions()
@@ -23,10 +21,6 @@ async function onClear() {
   })
   if (ok) await clear()
 }
-
-useNavbarActions(() => list.value.length
-  ? [{ id: 'clear-saved', label: 'Delete all', icon: 'i-lucide-trash-2', sfSymbol: 'trash', onSelect: onClear }]
-  : [])
 </script>
 
 <template>
@@ -60,6 +54,16 @@ useNavbarActions(() => list.value.length
         variant="naked"
         class="py-8"
       />
+      <k-block>
+        <UButton
+          label="Delete all"
+          icon="i-lucide-trash-2"
+          color="error"
+          variant="soft"
+          block
+          @click="onClear"
+        />
+      </k-block>
     </template>
 
     <UEmpty

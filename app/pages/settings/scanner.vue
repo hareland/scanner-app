@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { kBlockTitle, kBlockFooter, kList, kListItem, kToggle, kSegmented, kSegmentedButton } from 'konsta/vue'
 
-definePageMeta({ title: 'Scanner' })
+definePageMeta({ mobile: { title: 'Scanner' } })
 
 const { settings } = useScannerSettings()
 </script>

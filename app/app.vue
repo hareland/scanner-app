@@ -2,21 +2,16 @@
 import { App } from 'konsta/vue'
 
 const colorMode = useColorMode()
-// On a device the native bars own the safe areas (layouts/default.vue pads by their CSS variables).
-const nativeChrome = useState('native-chrome', () => false)
-
-// Toasts drop in from the top, just below the native navbar, as iOS banners do; at the bottom the tab bar hides them.
-// In a browser the variable is unset and they sit 1rem from the top.
-const toaster = { position: 'top-center' as const, ui: { viewport: 'top-[calc(var(--cap-native-navigation-top,0px)+1rem)]' } }
 </script>
 
 <template>
+  <!-- Konsta draws lists, sheets and dialogs; @frigear-nu/mobile owns the chrome and the safe areas. -->
   <App
     theme="ios"
-    :safe-areas="!nativeChrome"
+    :safe-areas="false"
     :dark="colorMode.value === 'dark'"
   >
-    <UApp :toaster="toaster">
+    <UApp :toaster="useMobileToaster()">
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>

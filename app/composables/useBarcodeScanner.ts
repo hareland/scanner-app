@@ -7,7 +7,6 @@ import {
 } from '@capacitor/barcode-scanner'
 import { createSharedComposable } from '@vueuse/core'
 import type { ScanResult, BarcodeFormat } from '~/types/scanner'
-import { haptic } from '~/lib/native'
 
 const formatMap: Record<number, BarcodeFormat> = {
   [CapacitorBarcodeScannerTypeHint.QR_CODE]: 'QR_CODE',
@@ -27,6 +26,7 @@ const formatMap: Record<number, BarcodeFormat> = {
 
 /** Scans one code with the system scanner. `results` holds this session's scans, oldest first. */
 const _useBarcodeScanner = () => {
+  const { haptic } = useNative()
   const results = ref<ScanResult[]>([])
   const { settings } = useScannerSettings()
 
@@ -54,7 +54,7 @@ const _useBarcodeScanner = () => {
       scannedAt: Date.now(),
     }
     results.value.push(item)
-    if (settings.hapticFeedback) haptic('success').catch(() => {})
+    if (settings.hapticFeedback) void haptic('success')
 
     return item
   }

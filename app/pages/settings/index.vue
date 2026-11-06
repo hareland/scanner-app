@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { kBlockTitle, kList, kListItem, kDialog, kDialogButton, kRadio } from 'konsta/vue'
 import { upperFirst } from 'scule'
-import { actionSheet, isNative } from '~/lib/native'
-
-definePageMeta({ title: 'Settings' })
 
 const colorMode = useColorMode()
+const { actionSheet, isNative } = useNative()
 const { isEnabled: developerMode } = useDeveloper()
 const { list } = useSavedScanResults()
 
 const themes = ['system', 'light', 'dark'] as const
 const themeDialog = ref(false)
-useOverlayVisibility(themeDialog)
+useSuppressTabBar(themeDialog)
 
 // On a device the choice is a native action sheet; in a browser a Konsta dialog.
 async function chooseTheme() {
@@ -20,12 +18,12 @@ async function chooseTheme() {
     colorMode.preference = themes[choice]!
     return
   }
-  if (!(await isNative())) themeDialog.value = true
+  if (!isNative) themeDialog.value = true
 }
 
 const version = ref<string>()
 onMounted(async () => {
-  if (!(await isNative())) return
+  if (!isNative) return
   const { App } = await import('@capacitor/app')
   const info = await App.getInfo()
   version.value = `${info.version} (${info.build})`

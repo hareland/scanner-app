@@ -1,17 +1,15 @@
-const appId = process.env.CAPACITOR_APP_ID || 'eu.hareland.app.scanner'
-
 // A static SPA: `nuxt generate` writes `.output/public`, which Capacitor serves from the device.
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
     '@nuxt/ui',
     '@frigear-nu/ui',
-    'nuxt-capacitor',
+    // The Capacitor app shell: native iOS tab bar and navbar, web chrome elsewhere. Installs nuxt-capacitor.
+    '@frigear-nu/mobile',
     'nuxt-qrcode',
     // Adds useDeveloper() always, and the /settings/developer page in dev builds.
     './modules/developer',
   ],
-  ssr: false,
   devtools: { enabled: false },
   app: {
     head: {
@@ -25,13 +23,9 @@ export default defineNuxtConfig({
     transpile: ['konsta'],
   },
   compatibilityDate: '2026-06-30',
-  // nuxt-capacitor writes capacitor.config.json from this (and points `webDir` at the generated output).
+  // nuxt-capacitor writes capacitor.config.json from this; @frigear-nu/mobile fills in appId, appName and autoSync: false.
   capacitor: {
-    // Off: on dev start it would run `nuxt generate` and `cap sync`. Sync explicitly with `ios:sync`.
-    autoSync: false,
     config: {
-      appId,
-      appName: process.env.CAPACITOR_APP_NAME || 'Scanner',
       plugins: {
         CapacitorHttp: {
           enabled: true,
@@ -50,6 +44,20 @@ export default defineNuxtConfig({
         blockSpacing: true,
       },
     },
+  },
+  mobile: {
+    appId: process.env.CAPACITOR_APP_ID || 'eu.hareland.app.scanner',
+    appName: process.env.CAPACITOR_APP_NAME || 'Scanner',
+    // One list for the native iOS tab bar, the web tab bar and the navbar titles.
+    tabs: [
+      { id: 'home', to: '/', label: 'Home', title: 'Scanner', icon: 'i-lucide-house', sfSymbol: 'house', sfSymbolActive: 'house.fill' },
+      { id: 'scan', to: '/scan', label: 'Scan', icon: 'i-lucide-scan-barcode', sfSymbol: 'barcode.viewfinder' },
+      { id: 'saved', to: '/saved', label: 'Saved', icon: 'i-lucide-bookmark', sfSymbol: 'bookmark', sfSymbolActive: 'bookmark.fill' },
+      { id: 'create', to: '/create', label: 'Create', icon: 'i-lucide-qr-code', sfSymbol: 'qrcode' },
+      { id: 'settings', to: '/settings', label: 'Settings', icon: 'i-lucide-settings', sfSymbol: 'gearshape', sfSymbolActive: 'gearshape.fill' },
+    ],
+    // The app opens no links of its own.
+    deepLinks: { schemes: false },
   },
   qrcode: {
     options: {

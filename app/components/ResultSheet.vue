@@ -8,7 +8,7 @@ const actions = useNativeActions()
 const format = useFormat()
 const toast = useToast()
 
-useOverlayVisibility(() => sheet.open)
+useSuppressTabBar(() => sheet.open)
 
 const result = computed(() => sheet.result)
 
