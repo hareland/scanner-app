@@ -11,7 +11,7 @@ const query = ref('')
 const filtered = computed(() => {
   const q = query.value.trim().toLowerCase()
   if (!q) return list.value
-  return list.value.filter(s => [s.text, s.description ?? '', formatLabel(s.format)].some(v => v.toLowerCase().includes(q)))
+  return list.value.filter(s => [s.text, s.description ?? '', formatLabel(normalizeFormat(s.format, s.text))].some(v => v.toLowerCase().includes(q)))
 })
 
 async function onClear() {

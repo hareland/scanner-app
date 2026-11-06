@@ -26,10 +26,12 @@ async function onDescribe() {
 }
 const saved = computed(() => !!sheet.savedId || (result.value ? isSaved(result.value) : false))
 const setup = computed(() => result.value ? parseSetupCode(result.value.text) : null)
+// Saved codes may carry a wrong UPC-A/EAN-13 tag from iOS; show and draw the corrected one.
+const codeFormat = computed(() => normalizeFormat(result.value?.format ?? '', result.value?.text ?? ''))
 
 const details = computed(() => result.value
   ? [
-      { key: 'format', label: 'Type', value: formatLabel(result.value.format) },
+      { key: 'format', label: 'Type', value: formatLabel(codeFormat.value) },
       { key: 'text', label: 'Value', value: result.value.text },
       { key: 'scannedAt', label: 'Scanned', value: format.dateTime(result.value.scannedAt) },
     ]
@@ -64,7 +66,7 @@ async function onDelete() {
     :opened="sheet.open"
     @backdropclick="closeSheet"
   >
-    <k-navbar :title="result ? (result.description || formatLabel(result.format)) : 'Result'">
+    <k-navbar :title="result ? (result.description || formatLabel(codeFormat)) : 'Result'">
       <template #right>
         <k-link
           icon-only
@@ -85,7 +87,7 @@ async function onDelete() {
     >
       <CodePreview
         :value="result.text"
-        :format="result.format"
+        :format="codeFormat"
       />
 
       <UFormField
