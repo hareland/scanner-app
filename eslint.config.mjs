@@ -8,4 +8,8 @@ export default withNuxt()
       '@typescript-eslint/no-explicit-any': 'off',
     },
   })
-  .append([{ ignores: ['./ios/**', './android/**', './electron/**'] }])
+  .append([
+    { ignores: ['./ios/**'] },
+    // Module pages are routes, named by their file like app/pages.
+    { files: ['modules/*/runtime/pages/**/*.vue'], rules: { 'vue/multi-word-component-names': 'off' } },
+  ])
