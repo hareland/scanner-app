@@ -60,11 +60,17 @@ export function jsBarcodeFormat(format: BarcodeFormat) {
 
 /**
  * Apple Vision reports UPC-A and EAN-13 alike, so iOS scans come back tagged with either one at random.
- * Trust the digit count instead: 13 digits is EAN-13, 11–12 is UPC-A. Other formats pass through.
+ * Trust the digits instead: a UPC-A is an EAN-13 with a leading 0 (iOS reads it that way),
+ * so 11–12 digits or 13 starting with 0 is UPC-A, other 13-digit codes are EAN-13.
  */
 export function normalizeFormat(format: BarcodeFormat, text: string): BarcodeFormat {
   if (format !== 'UPC_A' && format !== 'EAN_13') return format
+  if (/^(\d{11,12}|0\d{12})$/.test(text)) return 'UPC_A'
   if (/^\d{13}$/.test(text)) return 'EAN_13'
-  if (/^\d{11,12}$/.test(text)) return 'UPC_A'
   return format
+}
+
+/** The value to draw: JsBarcode wants a UPC-A without the leading 0 iOS adds. */
+export function barcodeValue(format: BarcodeFormat, text: string) {
+  return format === 'UPC_A' && /^0\d{12}$/.test(text) ? text.slice(1) : text
 }
