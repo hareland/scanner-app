@@ -2,22 +2,27 @@ import { defineNuxtModule, createResolver, extendPages, addImports } from '@nuxt
 import defu from 'defu'
 
 type ModuleOptions = {
+  /** Developer mode on from the start, without the unlock. Default: on in `nuxt dev`. */
   enabled?: boolean
 }
+
+/**
+ * Developer tools at /settings/developer. On in dev builds; in any other build a user turns it on by tapping the
+ * version in Settings seven times (`useDeveloper().unlock()`), as on Android.
+ */
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: 'developer',
   },
   defaults: {},
-  async setup(_, nuxt) {
-    // @ts-expect-error idk not typed
-    nuxt.options.runtimeConfig.public.developer = nuxt.options.developer = defu(_, nuxt.options.developer, {
+  setup(options, nuxt) {
+    // @ts-expect-error `developer` is not a typed Nuxt option
+    nuxt.options.runtimeConfig.public.developer = nuxt.options.developer = defu(options, nuxt.options.developer, {
       enabled: nuxt.options.dev,
     })
 
     const resolver = createResolver(import.meta.url)
 
-    // We include the developer composable no matter what:
     addImports([
       {
         name: 'useDeveloper',
@@ -25,18 +30,13 @@ export default defineNuxtModule<ModuleOptions>({
       },
     ])
 
-    if (!nuxt.options.developer.enabled) return
-
-    console.log(`developer module in ${resolver.resolve('./')}`)
-
+    // Always there: the page guards itself, since developer mode can be unlocked at runtime.
     const routePath = '/settings/developer'
-    const filePath = resolver.resolve('./runtime/pages/developer.vue')
-
     extendPages((pages) => {
       if (!pages.some(page => page.path === routePath)) {
         pages.push({
           path: routePath,
-          file: filePath,
+          file: resolver.resolve('./runtime/pages/developer.vue'),
         })
       }
     })

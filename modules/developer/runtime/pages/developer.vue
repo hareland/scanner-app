@@ -1,14 +1,29 @@
 <script setup lang="ts">
 import { kBlock, kBlockTitle, kList, kListItem } from 'konsta/vue'
-import { definePageMeta, useNativeActions, useSavedScanResults, useScannerSettings, useToast, ref } from '#imports'
+import { definePageMeta, navigateTo, useDeveloper, useNativeActions, useSavedScanResults, useScannerSettings, useToast, ref } from '#imports'
 import type { ScanResult } from '~/types/scanner'
 
-definePageMeta({ mobile: { title: 'Developer' } })
+definePageMeta({
+  mobile: { title: 'Developer' },
+  // Only once developer mode is on (dev builds, or unlocked from the version in Settings).
+  middleware: async () => {
+    const developer = useDeveloper()
+    await developer.ready
+    if (!developer.isEnabled.value) return navigateTo('/settings', { replace: true })
+  },
+})
 
 const toast = useToast()
 const actions = useNativeActions()
 const { list, importItems } = useSavedScanResults()
 const { settings, reset } = useScannerSettings()
+const developer = useDeveloper()
+
+async function onLock() {
+  await developer.lock()
+  toast.add({ title: 'Developer mode is off', icon: 'i-lucide-wrench' })
+  await navigateTo('/settings', { replace: true })
+}
 
 const importInput = ref('')
 
@@ -77,6 +92,17 @@ async function onImport() {
         variant="soft"
         class="mt-3"
         @click="reset"
+      />
+    </k-block>
+
+    <k-block v-if="!developer.builtIn.value">
+      <UButton
+        label="Turn off developer mode"
+        icon="i-lucide-wrench"
+        color="neutral"
+        variant="soft"
+        block
+        @click="onLock"
       />
     </k-block>
   </div>

@@ -5,8 +5,8 @@ import { upperFirst } from 'scule'
 definePageMeta({ mobile: { title: 'Settings' } })
 
 const colorMode = useColorMode()
-const { actionSheet, isNative } = useNative()
-const { isEnabled: developerMode } = useDeveloper()
+const { actionSheet, isNative, haptic } = useNative()
+const { isEnabled: developerMode, unlock } = useDeveloper()
 const { list } = useSavedScanResults()
 
 const themes = ['system', 'light', 'dark'] as const
@@ -30,6 +30,31 @@ onMounted(async () => {
   const info = await App.getInfo()
   version.value = `${info.version} (${info.build})`
 })
+
+// Seven taps on the version turn developer mode on, as on Android; a pause of over 1.5s starts the count again.
+const UNLOCK_TAPS = 7
+const toast = useToast()
+let taps = 0
+let lastTap = 0
+async function onVersionTap() {
+  const now = Date.now()
+  taps = now - lastTap > 1500 ? 1 : taps + 1
+  lastTap = now
+  if (developerMode.value) {
+    if (taps === 1) toast.add({ id: 'developer', title: 'Developer mode is already on', icon: 'i-lucide-wrench' })
+    return
+  }
+  const left = UNLOCK_TAPS - taps
+  if (left > 0) {
+    void haptic('selection')
+    if (left <= 4) toast.add({ id: 'developer', title: `${left} ${left === 1 ? 'tap' : 'taps'} from developer mode`, icon: 'i-lucide-wrench' })
+    return
+  }
+  taps = 0
+  await unlock()
+  void haptic('success')
+  toast.add({ id: 'developer', title: 'Developer mode is on', description: 'Find the tools under Developer in Settings.', icon: 'i-lucide-wrench', color: 'success' })
+}
 </script>
 
 <template>
@@ -115,6 +140,7 @@ onMounted(async () => {
       <k-list-item
         title="Version"
         :after="version ?? 'Web'"
+        @click="onVersionTap"
       />
     </k-list>
 
