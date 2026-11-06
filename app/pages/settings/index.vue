@@ -2,6 +2,8 @@
 import { kBlockTitle, kList, kListItem, kDialog, kDialogButton, kRadio } from 'konsta/vue'
 import { upperFirst } from 'scule'
 
+definePageMeta({ mobile: { title: 'Settings' } })
+
 const colorMode = useColorMode()
 const { actionSheet, isNative } = useNative()
 const { isEnabled: developerMode } = useDeveloper()

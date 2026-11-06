@@ -6,6 +6,10 @@ const { list: saved } = useSavedScanResults()
 const { present, scanAndPresent } = useScanFlow()
 
 const recent = computed(() => [...results.value].reverse().slice(0, 5))
+
+useNavbarActions([
+  { id: 'settings', label: 'Settings', icon: 'i-lucide-settings', sfSymbol: 'gearshape', onSelect: () => navigateTo('/settings') },
+])
 </script>
 
 <template>

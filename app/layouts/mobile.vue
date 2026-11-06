@@ -5,6 +5,7 @@
  */
 const { state } = useMobileChrome()
 const { scanAndPresent } = useScanFlow()
+const actions = useNavbarActionsState()
 
 // Scan from any tab but Scan itself; it goes with the tab bar while a sheet or dialog is open.
 const showFab = computed(() => state.value.tabBar.visible && state.value.activeTab?.id !== 'scan')
@@ -12,7 +13,20 @@ const showFab = computed(() => state.value.tabBar.visible && state.value.activeT
 
 <template>
   <div class="flex min-h-dvh flex-col bg-default">
-    <MobileHeader />
+    <MobileHeader>
+      <template #trailing>
+        <UButton
+          v-for="action in actions"
+          :key="action.id"
+          :icon="action.icon"
+          :aria-label="action.label"
+          color="neutral"
+          variant="ghost"
+          class="-me-2"
+          @click="action.onSelect"
+        />
+      </template>
+    </MobileHeader>
     <main
       class="flex flex-1 flex-col pb-[calc(var(--mobile-inset-bottom)+6rem)]"
       :class="{ 'pt-(--mobile-inset-top)': state.mode === 'native' || !state.header.visible }"
