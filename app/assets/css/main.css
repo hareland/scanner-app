@@ -2,26 +2,14 @@
 @import "konsta/vue/theme.css";
 @import "@nuxt/ui";
 
-/* Static fallbacks in @theme for Tailwind to generate utilities */
-/* Runtime mappings via CSS custom properties */
+/* Konsta reads its colors from these; point them at Nuxt UI's so both systems share one palette. */
 html {
-    --k-color-primary: var(--ui-primary, #22c55e);
-    --k-color-secondary: var(--ui-secondary);
-    --k-color-neutral: var(--ui-neutral, #374151);
-    --color-brand-red: var(--ui-error, #ef4444);
-    --color-brand-blue: var(--ui-info, #3b82f6);
-    --color-brand-yellow: var(--ui-warning, #eab308);
-}
-@theme {
-    --k-color-primary: #22c55e;
-    --k-color-neutral: #374151;
-    --color-brand-red:  #ef4444;
-    --color-brand-blue: #3b82f6;
-    --color-brand-yellow: #eab308;
-    --color-brand-green: #22c55e;
-    --color-brand-purple: #a855f7;
+  --k-color-primary: var(--ui-primary, #22c55e);
+  --color-brand-red: var(--ui-error, #ef4444);
 }
 
+@theme static {
+  --k-color-primary: #22c55e;
+  --color-brand-red: #ef4444;
+}
 
-@custom-variant electron (&:where([data-platform="electron"] *));
-@custom-variant web (&:where([data-platform="web"] *));

@@ -23,3 +23,6 @@ logs
 .env.*
 !.env.example
 capacitor.config.json
+
+# Synced web assets
+ios/App/App/public

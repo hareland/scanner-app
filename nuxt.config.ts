@@ -1,41 +1,40 @@
+// A static SPA: `nuxt generate` writes `.output/public`, which Capacitor serves from the device.
 export default defineNuxtConfig({
   modules: [
-    'nuxt-qrcode',
-    '@nuxt/ui',
-    '@nuxtjs/color-mode',
-    'nuxt-capacitor',
     '@nuxt/eslint',
-    ...import.meta.dev ? ['./modules/developer'] : [],
+    '@nuxt/ui',
+    '@frigear-nu/ui',
+    // The Capacitor app shell: native iOS tab bar and navbar, web chrome elsewhere. Installs nuxt-capacitor.
+    '@frigear-nu/mobile',
+    'nuxt-qrcode',
+    // Adds useDeveloper() always, and the /settings/developer page in dev builds.
+    './modules/developer',
   ],
-  ssr: false,
   devtools: { enabled: false },
   app: {
     head: {
+      // maximum-scale=1 stops iOS zooming the page when a field with text under 16px gets focus.
+      viewport: 'width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover',
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+      ],
       meta: [
-        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover' },
+        { name: 'theme-color', media: '(prefers-color-scheme: light)', content: '#ffffff' },
+        { name: 'theme-color', media: '(prefers-color-scheme: dark)', content: '#18181b' },
       ],
     },
   },
   css: ['~/assets/css/main.css'],
-  colorMode: {
-    classPrefix: '',
-    preference: 'system',
-    fallback: 'light',
-    storage: 'localStorage',
-  },
   spaLoadingTemplate: false,
   build: {
     transpile: ['konsta'],
   },
-  compatibilityDate: '2025-07-15',
+  compatibilityDate: '2026-06-30',
+  // nuxt-capacitor writes capacitor.config.json from this; @frigear-nu/mobile fills in appId, appName and autoSync: false.
   capacitor: {
     config: {
-      appId: process.env.CAPACITOR_APP_ID || 'eu.hareland.app.scanner',
-      appName: process.env.CAPACITOR_APP_NAME || 'Scanner',
       plugins: {
-        StatusBar: {
-          style: 'DARK',
-        },
         CapacitorHttp: {
           enabled: true,
         },
@@ -43,13 +42,7 @@ export default defineNuxtConfig({
       ios: {
         contentInset: 'never',
       },
-      electron: {
-        safeDomains: ['fonts.googleapis.com', 'api.iconify.design'],
-      },
     },
-  },
-  developer: {
-    enabled: true,
   },
   eslint: {
     config: {
@@ -60,18 +53,44 @@ export default defineNuxtConfig({
       },
     },
   },
+  icon: {
+    // A Capacitor app has no server to fetch icons from, and may be offline: every icon ships in the bundle.
+    clientBundle: {
+      // The default scan skips .ts files (utils/scan.ts picks icons by content type).
+      scan: { globInclude: ['app/**/*.{vue,ts}', 'modules/**/*.{vue,ts}'] },
+      // Icons named outside the app: the tabs below, and @frigear-nu/mobile and @frigear-nu/ui components.
+      icons: [
+        'lucide:house', 'lucide:scan-barcode', 'lucide:bookmark', 'lucide:qr-code', 'lucide:settings',
+        'lucide:plus', 'lucide:chevron-left', 'lucide:chevron-right', 'lucide:x', 'lucide:check', 'lucide:ellipsis',
+        'lucide:circle-alert', 'lucide:clipboard-check', 'lucide:loader-2', 'lucide:search', 'lucide:eye',
+      ],
+    },
+  },
+  mobile: {
+    appId: process.env.CAPACITOR_APP_ID || 'eu.hareland.app.scanner',
+    appName: process.env.CAPACITOR_APP_NAME || 'Scanner',
+    // One list for the native iOS tab bar, the web tab bar and the navbar titles.
+    tabs: [
+      { id: 'home', to: '/', label: 'Home', title: 'Scanner', icon: 'i-lucide-house', sfSymbol: 'house', sfSymbolActive: 'house.fill' },
+      { id: 'scan', to: '/scan', label: 'Scan', icon: 'i-lucide-scan-barcode', sfSymbol: 'barcode.viewfinder' },
+      { id: 'saved', to: '/saved', label: 'Saved', icon: 'i-lucide-bookmark', sfSymbol: 'bookmark', sfSymbolActive: 'bookmark.fill' },
+      { id: 'create', to: '/create', label: 'Create', icon: 'i-lucide-qr-code', sfSymbol: 'qrcode' },
+    ],
+    // From the native launch screen (ios/App/App/Base.lproj/LaunchScreen.storyboard, same logo and colors) to the
+    // first page, without a flash of an empty WebView.
+    splashScreen: {
+      logo: '/logo.svg',
+      background: { light: '#ffffff', dark: '#18181b' },
+    },
+    // The app opens no links of its own.
+    deepLinks: { schemes: false },
+  },
   qrcode: {
     options: {
       variant: 'pixelated',
-      // OR
-      // variant: {
-      //   inner: 'circle',
-      //   marker: 'rounded',
-      //   pixel: 'rounded',
-      // },
       radius: 1,
-      blackColor: 'currentColor', // 'var(--ui-text-highlighted)' if you are using `@nuxt/ui` v3
-      whiteColor: 'transparent', // 'var(--ui-bg)'
+      blackColor: 'currentColor',
+      whiteColor: 'transparent',
     },
   },
 })

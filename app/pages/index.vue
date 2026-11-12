@@ -1,43 +1,80 @@
 <script setup lang="ts">
-import { kBlock, kBlockTitle } from 'konsta/vue'
-
-definePageMeta({
-  layout: 'home',
-})
+import { kBlock, kBlockTitle, kList } from 'konsta/vue'
 
 const { results } = useBarcodeScanner()
+const { list: saved } = useSavedScanResults()
+const { present, scanAndPresent } = useScanFlow()
 
-const { rightActions } = useMainNavbar()
+const recent = computed(() => [...results.value].reverse().slice(0, 5))
 
-onMounted(() => {
-  rightActions.value = [
-    { icon: 'i-lucide-cog', onClick() { navigateTo('/settings') } },
-  ]
-})
+useNavbarActions([
+  { id: 'settings', label: 'Settings', icon: 'i-lucide-settings', sfSymbol: 'gearshape', onSelect: () => navigateTo('/settings') },
+])
 </script>
 
 <template>
   <div>
-    <k-block
-      strong
-      inset-ios
-    >
-      <p>Start scanning, this app should work on iOS, Android and Electron (Mac, Windows, Linux).</p>
-      <p class="underline text-error">
-        Results will appear below as you scan.
-      </p>
+    <k-block class="grid grid-cols-2 gap-3">
+      <StatCard
+        label="This session"
+        :value="results.length"
+        icon="i-lucide-scan-barcode"
+        to="/scan"
+      />
+      <StatCard
+        label="Saved"
+        :value="saved.length"
+        icon="i-lucide-bookmark"
+        to="/saved"
+      />
     </k-block>
-    <k-block-title v-if="results.length">
-      Scan results
-    </k-block-title>
-    <k-block v-if="results.length">
-      <UPageGrid>
-        <ScanResultCard
-          v-for="result in results"
+
+    <k-block>
+      <UButton
+        label="Scan a code"
+        icon="i-lucide-scan-barcode"
+        size="xl"
+        block
+        @click="scanAndPresent"
+      />
+    </k-block>
+
+    <template v-if="recent.length">
+      <k-block-title>Recent scans</k-block-title>
+      <k-list
+        strong-ios
+        inset-ios
+      >
+        <ScanListItem
+          v-for="result in recent"
           :key="result.scannedAt"
           :result="result"
+          @select="present(result)"
         />
-      </UPageGrid>
+      </k-list>
+    </template>
+
+    <template v-if="saved.length">
+      <k-block-title>Recently saved</k-block-title>
+      <k-list
+        strong-ios
+        inset-ios
+      >
+        <ScanListItem
+          v-for="item in saved.slice(0, 3)"
+          :key="item.id"
+          :result="item"
+          @select="present(item, item.id)"
+        />
+      </k-list>
+    </template>
+
+    <k-block
+      v-if="!recent.length && !saved.length"
+      strong
+      inset
+    >
+      <p>Scan QR codes and barcodes, keep the ones you need, and make your own on the Create tab.</p>
     </k-block>
   </div>
 </template>

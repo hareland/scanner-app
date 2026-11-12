@@ -18,6 +18,8 @@ export type ScanResult = {
   text: string
   format: BarcodeFormat
   scannedAt: number
+  /** What the code is, in the user's words (e.g. "Gym locker", "Wi-Fi at the cabin"). */
+  description?: string
 }
 
 export type MatchOperator
